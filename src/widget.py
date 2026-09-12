@@ -1,14 +1,27 @@
+card_info = input()
+
 def get_mask_card_number(card_number: str) -> str:
     card_number_str = str(card_number)
     if len(card_number_str) != 16:
         return "Invalid card number"
-    masked_card = card_number_str[:6] + "******" + card_number_str[12:]
-
-    return masked_card[:4] + " " + masked_card[4:8] + " " + masked_card[8:12] + " " + masked_card[12:]
-
+    else:
+        masked_card = card_number_str[:6] + "******" + card_number_str[12:]
+        return masked_card[:4] + " " + masked_card[4:8] + " " + masked_card[8:12] + " " + masked_card[12:]
 
 def get_mask_account(card_number: str) -> str:
     card_number_str = str(card_number)
     if len(card_number_str) < 4:
         return "Invalid card number"
     return "**" + card_number_str[-4:]
+
+def mask_account_card(card_info: str) -> str:
+    card_info_str = str(card_info)
+    parts = card_info_str.rsplit(" ", 1)
+    if parts[0] == "Счет":
+        parts[-1] = get_mask_account(parts[-1])
+        return " ".join(parts)
+    else:
+        parts[-1] = get_mask_card_number(parts[-1])
+        return " ".join(parts)
+
+print(mask_account_card(card_info))
