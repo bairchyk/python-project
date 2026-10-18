@@ -7,6 +7,8 @@ authors = [
 ]
 requires-python = "^3.11"
 dependencies = [
+    "requests (>=2.34.2,<3.0.0)",
+    "python-dotenv (>=1.2.4,<2.0.0)"
 ]
 
 [tool.poetry]
@@ -29,6 +31,7 @@ flake8 = "^7.3.0"
 mypy = "^2.3.1"
 black = "^26.5.1"
 isort = "^9.0.1"
+types-requests = "^2.33.0.20261006"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -24,7 +24,7 @@ def card_number_generator(card_number_start: int, card_number_end: int) -> Itera
         ]
 
 
-if __name__ == "__main__": # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     transactions = [
         {
             "id": 939719570,

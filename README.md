@@ -4,9 +4,18 @@
 
 Проект содержит функции для обработки банковских операций.
 
-Реализованы функции для работы с номерами банковских карт и счетов, а также для фильтрации и сортировки операций.
+В проекте реализованы:
 
-Также реализован модуль `generators` для работы с генераторами банковских транзакций.
+- маскирование номеров банковских карт и счетов;
+- фильтрация и сортировка операций;
+- генераторы для работы с банковскими транзакциями;
+- декоратор для логирования работы функций;
+- чтение банковских операций из JSON-файла;
+- получение суммы транзакции в рублях;
+- конвертация USD и EUR в RUB через Exchange Rates Data API;
+- тестирование функциональности с использованием `pytest`, `Mock` и `patch`.
+
+Данные банковских операций хранятся в файле `data/operations.json`.
 
 ## Установка
 
@@ -28,21 +37,99 @@ cd python-project
 poetry install
 ```
 
-## Использование
+## Настройка переменных окружения
 
-Для запуска проекта активируйте виртуальное окружение Poetry:
+Для работы функции конвертации валют необходим API-ключ сервиса Exchange Rates Data API.
 
-```bash
-poetry shell
+Создайте в корне проекта файл `.env` и добавьте в него переменную:
+
+```env
+EXCHANGE_RATES_API_KEY=ваш_api_ключ
 ```
 
-После этого можно запускать необходимые Python-файлы или тесты проекта.
+Файл `.env` добавлен в `.gitignore` и не должен попадать в репозиторий.
 
-## Модуль generators
+В проекте также используется файл `.env.example`, содержащий шаблон необходимых переменных окружения без секретных значений:
+
+```env
+EXCHANGE_RATES_API_KEY=
+```
+
+## Структура проекта
+
+```text
+python-project/
+├── data/
+│   └── operations.json
+├── src/
+│   ├── decorators.py
+│   ├── external_api.py
+│   ├── generators.py
+│   ├── masks.py
+│   ├── processing.py
+│   ├── utils.py
+│   └── widget.py
+├── test/
+│   ├── test_decorators.py
+│   ├── test_external_api.py
+│   ├── test_generators.py
+│   ├── test_masks.py
+│   ├── test_processing.py
+│   ├── test_utils.py
+│   └── test_widget.py
+├── .env.example
+├── pyproject.toml
+└── poetry.lock
+```
+
+## Чтение операций из JSON
+
+Модуль `src.utils` содержит функцию `read_json_file`, которая принимает путь к JSON-файлу и возвращает список словарей с банковскими операциями.
+
+Если файл отсутствует, пустой, содержит некорректный JSON или содержит данные не в виде списка, функция возвращает пустой список.
+
+Пример использования:
+
+```python
+from src.utils import read_json_file
+
+transactions = read_json_file("data/operations.json")
+
+print(transactions[0])
+```
+
+## Конвертация валют
+
+Модуль `src.external_api` содержит функцию `transaction_amount`, которая принимает словарь с данными о транзакции и возвращает сумму операции в рублях в виде `float`.
+
+Для операций в RUB сумма возвращается без обращения к внешнему API.
+
+Для операций в USD и EUR выполняется запрос к Exchange Rates Data API для конвертации суммы в рубли.
+
+Пример использования:
+
+```python
+from src.external_api import transaction_amount
+
+transaction = {
+    "operationAmount": {
+        "amount": "10",
+        "currency": {
+            "code": "USD",
+        },
+    }
+}
+
+amount_in_rubles = transaction_amount(transaction)
+
+print(amount_in_rubles)
+```
+
+## Модуль `generators`
 
 Модуль `generators` содержит функции-генераторы для обработки банковских транзакций.
 
-### Функция filter_by_currency
+### Функция `filter_by_currency`
 
 Функция `filter_by_currency` принимает список словарей с транзакциями и код валюты.
 
@@ -59,7 +146,7 @@ for _ in range(2):
     print(next(usd_transactions))
 ```
 
-### Функция transaction_descriptions
+### Функция `transaction_descriptions`
 
 Функция-генератор `transaction_descriptions` принимает список словарей с транзакциями и поочередно возвращает описание каждой операции.
 
@@ -84,7 +171,7 @@ for _ in range(5):
 Перевод организации
 ```
 
-### Функция card_number_generator
+### Функция `card_number_generator`
 
 Функция-генератор `card_number_generator` генерирует номера банковских карт в заданном диапазоне.
 
@@ -113,68 +200,6 @@ for card_number in card_number_generator(1, 5):
 0000 0000 0000 0005
 ```
 
-## Проверка качества кода
-
-В проекте используются инструменты:
-
-* Black — форматирование кода;
-* isort — сортировка импортов;
-* Flake8 — проверка соответствия PEP 8;
-* mypy — проверка аннотаций типов.
-
-Запуск Black:
-
-```bash
-poetry run black src test
-```
-
-Запуск isort:
-
-```bash
-poetry run isort src test
-```
-
-Проверка Flake8:
-
-```bash
-poetry run flake8 src test
-```
-
-Проверка mypy:
-
-```bash
-poetry run mypy src
-```
-
-## Тестирование
-
-Для тестирования проекта используется библиотека pytest.
-
-Запуск всех тестов:
-
-```bash
-poetry run pytest
-```
-
-Для проверки покрытия кода тестами используется pytest-cov.
-
-Запуск тестов с проверкой покрытия:
-
-```bash
-poetry run pytest --cov=src
-```
-
-Для создания отчета покрытия тестами в формате HTML:
-
-```bash
-poetry run pytest --cov=src --cov-report=html
-```
-
-HTML-отчет будет создан в папке:
-
-```text
-htmlcov
-```
 ## Декоратор `log`
 
 В проекте реализован модуль `decorators`, содержащий декоратор `log` для логирования выполнения функций.
@@ -221,8 +246,70 @@ add finished
 add error: TypeError. Inputs: (1, '2'), {}
 ```
 
-Для декоратора написаны тесты с использованием `pytest`. Вывод в консоль проверяется с помощью фикстуры `capsys`, а запись логов в файл — с помощью временного файла `tmp_path`.
+## Тестирование
 
+Для тестирования проекта используется библиотека `pytest`.
+
+Запуск всех тестов:
+
+```bash
+poetry run pytest
+```
+
+Для проверки покрытия кода тестами используется `pytest-cov`:
+
+```bash
+poetry run pytest --cov=src --cov-report=term-missing
+```
+
+Для создания HTML-отчета покрытия:
+
+```bash
+poetry run pytest --cov=src --cov-report=html
+```
+
+HTML-отчет создается в директории:
+
+```text
+htmlcov/
+```
+
+Директория `htmlcov/` добавлена в `.gitignore` и не должна попадать в репозиторий.
+
+Тесты для чтения JSON-файла и конвертации валют используют `Mock` и `patch`, поэтому не зависят от реального файла, доступности внешнего API и действующего API-ключа.
+
+## Проверка качества кода
+
+В проекте используются следующие инструменты:
+
+- Black — форматирование кода;
+- isort — сортировка импортов;
+- Flake8 — проверка соответствия PEP 8;
+- mypy — статическая проверка типов.
+
+Запуск Black:
+
+```bash
+poetry run black src test
+```
+
+Запуск isort:
+
+```bash
+poetry run isort src test
+```
+
+Проверка Flake8:
+
+```bash
+poetry run flake8 src test
+```
+
+Проверка mypy:
+
+```bash
+poetry run mypy src
+```
 
 ## Документация
 
