@@ -37,7 +37,6 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Unit test / coverage reports
-htmlcov/
 .tox/
 .nox/
 .coverage
@@ -51,6 +50,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+htmlcov/
 
 # Translations
 *.mo
@@ -220,3 +220,5 @@ __marimo__/
 .streamlit/secrets.toml
 
 .idea/
+
+/python-project/
