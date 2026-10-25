@@ -8,7 +8,9 @@ authors = [
 requires-python = "^3.11"
 dependencies = [
     "requests (>=2.34.2,<3.0.0)",
-    "python-dotenv (>=1.2.4,<2.0.0)"
+    "python-dotenv (>=1.2.4,<2.0.0)",
+    "pandas (>=3.1.0,<4.0.0)",
+    "openpyxl (>=3.1.5,<4.0.0)"
 ]
 
 [tool.poetry]
@@ -37,6 +39,7 @@ types-requests = "^2.33.0.20261006"
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.1.1"
 pytest-cov = "^7.1.0"
+pandas-stubs = "^3.0.5.260914"
 
 [tool.black]
 line-length = 119

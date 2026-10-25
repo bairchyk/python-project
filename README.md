@@ -11,11 +11,12 @@
 - генераторы для работы с банковскими транзакциями;
 - декоратор для логирования работы функций;
 - чтение банковских операций из JSON-файла;
+- чтение финансовых операций из CSV- и Excel-файлов;
 - получение суммы транзакции в рублях;
 - конвертация USD и EUR в RUB через Exchange Rates Data API;
 - тестирование функциональности с использованием `pytest`, `Mock` и `patch`.
 
-Данные банковских операций хранятся в файле `data/operations.json`.
+Данные банковских операций могут храниться в JSON-, CSV- и Excel-файлах. Для работы с CSV и Excel используется модуль `src.file_reader`.
 
 ## Установка
 
@@ -64,6 +65,7 @@ python-project/
 ├── src/
 │   ├── decorators.py
 │   ├── external_api.py
+│   ├── file_reader.py
 │   ├── generators.py
 │   ├── masks.py
 │   ├── processing.py
@@ -72,11 +74,14 @@ python-project/
 ├── test/
 │   ├── test_decorators.py
 │   ├── test_external_api.py
+│   ├── test_file_reader.py
 │   ├── test_generators.py
 │   ├── test_masks.py
 │   ├── test_processing.py
 │   ├── test_utils.py
 │   └── test_widget.py
+├── transactions.csv
+├── transactions_excel.xlsx
 ├── .env.example
 ├── pyproject.toml
 └── poetry.lock
@@ -94,6 +99,39 @@ python-project/
 from src.utils import read_json_file
 
 transactions = read_json_file("data/operations.json")
+
+print(transactions[0])
+```
+
+
+## Чтение операций из CSV и Excel
+
+Модуль `src.file_reader` содержит функции для считывания финансовых операций из CSV- и Excel-файлов. Обе функции принимают путь к файлу в качестве аргумента и возвращают список словарей с транзакциями.
+
+### Функция `read_csv_file`
+
+Функция `read_csv_file` считывает финансовые операции из CSV-файла. Для разбора строк используется `csv.DictReader`, поэтому каждая операция представлена словарем.
+
+Пример использования:
+
+```python
+from src.file_reader import read_csv_file
+
+transactions = read_csv_file("transactions.csv")
+
+print(transactions[0])
+```
+
+### Функция `read_xlsx_file`
+
+Функция `read_xlsx_file` считывает финансовые операции из Excel-файла с помощью библиотеки `pandas` и преобразует данные в список словарей.
+
+Пример использования:
+
+```python
+from src.file_reader import read_xlsx_file
+
+transactions = read_xlsx_file("transactions_excel.xlsx")
 
 print(transactions[0])
 ```
